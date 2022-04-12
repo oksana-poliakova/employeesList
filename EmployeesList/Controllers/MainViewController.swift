@@ -10,14 +10,7 @@ import CoreData
 
 class MainViewController: UIViewController {
     // MARK: - Properties
-    
-    private var models = [Employee]()
-    
-    private let context: NSManagedObjectContext = {
-        guard let context = (UIApplication.shared.delegate as? AppDelegate)?.persistentContainer.viewContext else { return NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType) }
-        return context
-    }()
-    
+
     private lazy var tableView: UITableView = {
         /// Appearance
         let tableView = UITableView(frame: view.bounds, style: .grouped)
@@ -32,10 +25,23 @@ class MainViewController: UIViewController {
         
         return tableView
     }()
+    
+    private var models: [Employee] = []
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        setNavigationItem()
         setupUI()
+        
+        /// get items from coreData
+        getAllEmployees()
+    }
+    
+    private func getAllEmployees() {
+        CoreDataManager().getAllEmployees { employees in
+            self.models = employees
+            self.tableView.reloadData()
+        }
     }
 
     // MARK: - TableView
@@ -49,7 +55,45 @@ class MainViewController: UIViewController {
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
             tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
         ])
+    }
+    
+    // MARK: - Set navigation item
+    
+    private func setNavigationItem() {
+        navigationItem.title = "CoreData To Do List"
+        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add,
+                                                            target: self,
+                                                            action: #selector(didTapAdd))
+    }
+    
+    @objc private func didTapAdd() {
+        let alert = UIAlertController(title: "New Employee",
+                                      message: "Enter a new employee",
+                                      preferredStyle: .alert)
+        alert.addTextField { textField in
+            textField.placeholder = "Add gender"
+        }
+        alert.addTextField { textField in
+            textField.placeholder = "Add name"
+        }
+        alert.addTextField { textField in
+            textField.placeholder = "Add salary"
+        }
+
+        alert.addAction(UIAlertAction(title: "Submit",
+                                      style: .cancel,
+                                      handler: { [weak self] _ in
+            guard let genderField = alert.textFields?[0], let genderText = genderField.text, !genderText.isEmpty else { return }
+            guard let nameField = alert.textFields?[1], let nameText = nameField.text, !nameText.isEmpty else { return }
+            guard let salaryField = alert.textFields?[2], let salaryText = salaryField.text, !salaryText.isEmpty else { return }
+            
+            CoreDataManager().addEmployee(gender: genderText, name: nameText, salary: (salaryField as? NSString)?.doubleValue ?? 0) { isAdded in
+                if isAdded { self?.getAllEmployees() }
+            }
+            
+        }))
         
+        present(alert, animated: true)
     }
 }
 
@@ -65,7 +109,6 @@ extension MainViewController: UITableViewDataSource {
         cell.configureEmployee(model: models[indexPath.row])
         return cell
     }
-    
 }
 
 // MARK: - UITableViewDataSource

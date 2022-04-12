@@ -45,7 +45,7 @@ class MainTableViewCell: UITableViewCell {
         stackView.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(stackView)
         
-        stackView.axis = .horizontal
+        stackView.axis = .vertical
         stackView.distribution = .fill
         stackView.spacing = 6
         stackView.alignment = .fill
@@ -57,5 +57,4 @@ class MainTableViewCell: UITableViewCell {
             stackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
         ])
     }
-
 }
