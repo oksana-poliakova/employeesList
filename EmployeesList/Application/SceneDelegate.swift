@@ -16,6 +16,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             return
         }
         
+        CoreDataManager().createDefaultEmployees()
         // Create a new window property
         self.window = UIWindow(frame: windowScene.coordinateSpace.bounds)
         

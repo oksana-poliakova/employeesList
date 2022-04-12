@@ -87,7 +87,7 @@ class MainViewController: UIViewController {
             guard let nameField = alert.textFields?[1], let nameText = nameField.text, !nameText.isEmpty else { return }
             guard let salaryField = alert.textFields?[2], let salaryText = salaryField.text, !salaryText.isEmpty else { return }
             
-            CoreDataManager().addEmployee(gender: genderText, name: nameText, salary: (salaryField as? NSString)?.doubleValue ?? 0) { isAdded in
+            CoreDataManager().addEmployee(gender: genderText, name: nameText, salary: (salaryText as NSString).doubleValue) { isAdded in
                 if isAdded { self?.getAllEmployees() }
             }
             

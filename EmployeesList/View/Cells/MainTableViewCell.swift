@@ -28,11 +28,11 @@ class MainTableViewCell: UITableViewCell {
     }
     
     public func configureEmployee(model: Employee) {
-        nameLabel.text = model.name
-        idLabel.text = "\(String(describing: model.id))"
-        birthDateLabel.text = "\(String(describing: model.birthDate))"
-        genderLabel.text = model.gender
-        salaryLabel.text = "\(String(describing: model.gender))"
+        nameLabel.text = "Name: \(model.name ?? "")"
+        idLabel.text = "ID: \(String(describing: model.id))"
+        birthDateLabel.text = "Birthdate: \(model.birthDate?.description ?? "")"
+        genderLabel.text = "GENDER: \(model.gender ?? "")"
+        salaryLabel.text = "SALARY: \(String(describing: model.salary))"
     }
     
     private func setupUI() {
@@ -51,10 +51,10 @@ class MainTableViewCell: UITableViewCell {
         stackView.alignment = .fill
         
         NSLayoutConstraint.activate([
-            stackView.topAnchor.constraint(equalTo: contentView.topAnchor),
-            stackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
-            stackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            stackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
+            stackView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 16),
+            stackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 16),
+            stackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -16),
+            stackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -16)
         ])
     }
 }

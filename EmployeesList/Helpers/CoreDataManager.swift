@@ -23,7 +23,7 @@ class CoreDataManager {
         } catch { }
     }
 
-    public func addEmployee(gender: String, name: String, salary: Double, completion: @escaping((Bool) -> ())) {
+    public func addEmployee(gender: String, name: String, salary: Double, completion: ((Bool) -> ())? = nil) {
         let newEmployee = Employee(context: context)
         newEmployee.id = Int64()
         newEmployee.gender = gender
@@ -33,9 +33,9 @@ class CoreDataManager {
         
         do {
             try context.save()
-            completion(true)
+            completion?(true)
         } catch {
-            completion(false)
+            completion?(false)
         }
     }
 
@@ -54,5 +54,23 @@ class CoreDataManager {
         do {
             try context.save()
         } catch { }
+    }
+    
+    public func createDefaultEmployees() {
+        getAllEmployees { [weak self] employee in
+            if employee.isEmpty {
+                let tupleArray: [(gender: String,
+                                  name: String,
+                                  salary: Double)] = [(gender: "FEMALE", name: "ALEKS", salary: 300),
+                                                      (gender: "Male", name: "John", salary: 5000),
+                                                      (gender: "FEMALE", name: "ANTON", salary: 10000)]
+                
+//                let sum = tupleArray.map({ $0.salary }).reduce(0, +) / Double(tupleArray.count)
+                
+                tupleArray.forEach { tuple in
+                    self?.addEmployee(gender: tuple.gender, name: tuple.name, salary: tuple.salary, completion: nil)
+                }
+            }
+        }
     }
 }
