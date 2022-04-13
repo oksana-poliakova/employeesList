@@ -23,13 +23,21 @@ class CoreDataManager {
         } catch { }
     }
 
-    public func addEmployee(gender: String, name: String, salary: Double, completion: ((Bool) -> ())? = nil) {
+    public func addEmployee(gender: String, name: String, salary: Double, date: String, completion: ((Bool) -> ())? = nil) {
         let newEmployee = Employee(context: context)
         newEmployee.id = Int64()
         newEmployee.gender = gender
         newEmployee.name = name
-        newEmployee.birthDate = Date()
         newEmployee.salary = salary
+        
+        let isoDate = date
+        let dateFormatter = DateFormatter()
+        dateFormatter.locale = Locale.current
+        
+        dateFormatter.dateFormat = "yyyy-MM-dd"
+        guard let date = dateFormatter.date(from: isoDate) else { return }
+        
+        newEmployee.birthDate = date
         
         do {
             try context.save()
@@ -61,17 +69,13 @@ class CoreDataManager {
             if employee.isEmpty {
                 let tupleArray: [(gender: String,
                                   name: String,
-                                  salary: Double)] = [(gender: "Male", name: "Aleksandr Poliakov", salary: 10000),
-                                                      (gender: "Female", name: "Oksana Poliakova", salary: 5000),
-                                                      (gender: "Female", name: "John Dou", salary: 8000)]
-                
-//                let sum = tupleArray.map({ $0.salary }).reduce(0, +) / Double(tupleArray.count)
-//                label.text =  "AverageAge: \(map{ $0 })"
-//                API KEY
-//                AIzaSyAJ4Pl1kyK-wHM2-hYeF9hcgU08otU97FA
+                                  salary: Double,
+                                  date: String)] = [(gender: "Male", name: "Aleksandr Poliakov", salary: 10000, date: "2002-02-02"),
+                                                      (gender: "Female", name: "Oksana Poliakova", salary: 5000, date: "1998-02-02"),
+                                                      (gender: "Female", name: "John Dou", salary: 8000, date: "1995-02-02")]
                 
                 tupleArray.forEach { tuple in
-                    self?.addEmployee(gender: tuple.gender, name: tuple.name, salary: tuple.salary, completion: nil)
+                    self?.addEmployee(gender: tuple.gender, name: tuple.name, salary: tuple.salary, date: tuple.date, completion: nil)
                 }
             }
         }

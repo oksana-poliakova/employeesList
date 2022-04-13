@@ -63,9 +63,10 @@ class MainViewController: UIViewController {
     }
     
     private func getAllEmployees() {
-        CoreDataManager().getAllEmployees { employees in
-            self.models = employees
-            self.tableView.reloadData()
+        CoreDataManager().getAllEmployees { [weak self] employees in
+            self?.models = employees
+            self?.configureAnalytics(employee: employees)
+            self?.tableView.reloadData()
         }
     }
 
@@ -97,11 +98,11 @@ class MainViewController: UIViewController {
         [headerForAnalyticsView, headerForPublicProfileView].forEach {
             $0.font = UIFont.boldSystemFont(ofSize: 16)
         }
-
-        averageAgeLabel.text = "Average age is: "
-        medianAgeLabel.text = "Median age is: "
-        maxSalaryLabel.text = "Max salary is: "
-        genderRatioLabel.text = "Male vs Female workers ratio: "
+        
+        //                let sum = tupleArray.map({ $0.salary }).reduce(0, +) / Double(tupleArray.count)
+        //                label.text =  "AverageAge: \(map{ $0 })"
+        //                API KEY
+        //                AIzaSyAJ4Pl1kyK-wHM2-hYeF9hcgU08otU97FA
         
         /// Constraints
         NSLayoutConstraint.activate([
@@ -137,10 +138,18 @@ class MainViewController: UIViewController {
     // MARK: - Set navigation item
     
     private func setNavigationItem() {
-        navigationItem.title = "CoreData To Do List"
+        navigationItem.title = "Employees List with Analytics"
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add,
                                                             target: self,
                                                             action: #selector(didTapAdd))
+    }
+    
+    private func configureAnalytics(employee: [Employee]) {
+        
+        averageAgeLabel.text = "Average age is: \(employee.compactMap({ $0.age }).reduce(0, +) / employee.count)"
+        medianAgeLabel.text = "Median age is: "
+        maxSalaryLabel.text = "Max salary is: "
+        genderRatioLabel.text = "Male vs Female workers ratio: "
     }
     
     @objc private func didTapAdd() {
@@ -156,6 +165,10 @@ class MainViewController: UIViewController {
         alert.addTextField { textField in
             textField.placeholder = "Add salary"
         }
+        
+        alert.addTextField { textField in
+            textField.placeholder = "Add birthdate: XXXX-XX-XX"
+        }
 
         alert.addAction(UIAlertAction(title: "Submit",
                                       style: .cancel,
@@ -163,8 +176,9 @@ class MainViewController: UIViewController {
             guard let genderField = alert.textFields?[0], let genderText = genderField.text, !genderText.isEmpty else { return }
             guard let nameField = alert.textFields?[1], let nameText = nameField.text, !nameText.isEmpty else { return }
             guard let salaryField = alert.textFields?[2], let salaryText = salaryField.text, !salaryText.isEmpty else { return }
+            guard let birthdateField = alert.textFields?[3], let birthdateText = birthdateField.text, !birthdateText.isEmpty else { return }
             
-            CoreDataManager().addEmployee(gender: genderText, name: nameText, salary: (salaryText as NSString).doubleValue) { isAdded in
+            CoreDataManager().addEmployee(gender: genderText, name: nameText, salary: (salaryText as NSString).doubleValue, date: birthdateText) { isAdded in
                 if isAdded { self?.getAllEmployees() }
             }
             

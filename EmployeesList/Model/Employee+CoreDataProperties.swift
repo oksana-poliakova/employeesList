@@ -21,6 +21,10 @@ extension Employee {
     @NSManaged public var birthDate: Date?
     @NSManaged public var gender: String?
     @NSManaged public var salary: Double
+    
+    public var age: Int {
+        return birthDate?.age ?? 0
+    }
 
 }
 
