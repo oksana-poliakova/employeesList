@@ -17,6 +17,7 @@
 		A1A210C92803286F0012D6AF /* Employee+CoreDataClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1A210C72803286F0012D6AF /* Employee+CoreDataClass.swift */; };
 		A1A210CA2803286F0012D6AF /* Employee+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1A210C82803286F0012D6AF /* Employee+CoreDataProperties.swift */; };
 		A1F033E228058242002D8488 /* CoreDataManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1F033E128058242002D8488 /* CoreDataManager.swift */; };
+		A1F033E42806F13A002D8488 /* Profile.swift in Sources */ = {isa = PBXBuildFile; fileRef = A1F033E32806F13A002D8488 /* Profile.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +33,7 @@
 		A1A210C72803286F0012D6AF /* Employee+CoreDataClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Employee+CoreDataClass.swift"; sourceTree = "<group>"; };
 		A1A210C82803286F0012D6AF /* Employee+CoreDataProperties.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Employee+CoreDataProperties.swift"; sourceTree = "<group>"; };
 		A1F033E128058242002D8488 /* CoreDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CoreDataManager.swift; sourceTree = "<group>"; };
+		A1F033E32806F13A002D8488 /* Profile.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Profile.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -123,6 +125,7 @@
 			children = (
 				A1A210C72803286F0012D6AF /* Employee+CoreDataClass.swift */,
 				A1A210C82803286F0012D6AF /* Employee+CoreDataProperties.swift */,
+				A1F033E32806F13A002D8488 /* Profile.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -220,6 +223,7 @@
 				A1A210A32803203B0012D6AF /* SceneDelegate.swift in Sources */,
 				A1A210BF280323870012D6AF /* MainTableViewCell.swift in Sources */,
 				A1F033E228058242002D8488 /* CoreDataManager.swift in Sources */,
+				A1F033E42806F13A002D8488 /* Profile.swift in Sources */,
 				A1A210CA2803286F0012D6AF /* Employee+CoreDataProperties.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

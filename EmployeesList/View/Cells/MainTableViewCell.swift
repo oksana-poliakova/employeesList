@@ -31,8 +31,8 @@ class MainTableViewCell: UITableViewCell {
         nameLabel.text = "Name: \(model.name ?? "")"
         idLabel.text = "ID: \(String(describing: model.id))"
         birthDateLabel.text = "Birthdate: \(model.birthDate?.description ?? "")"
-        genderLabel.text = "GENDER: \(model.gender ?? "")"
-        salaryLabel.text = "SALARY: \(String(describing: model.salary))"
+        genderLabel.text = "Gender: \(model.gender ?? "")"
+        salaryLabel.text = "Salary: \(String(describing: model.salary))"
     }
     
     private func setupUI() {
@@ -41,6 +41,8 @@ class MainTableViewCell: UITableViewCell {
             $0.textColor = .black
             stackView.addArrangedSubview($0)
         }
+        
+        nameLabel.font = UIFont.boldSystemFont(ofSize: 14)
         
         stackView.translatesAutoresizingMaskIntoConstraints = false
         contentView.addSubview(stackView)

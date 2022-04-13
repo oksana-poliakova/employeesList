@@ -10,7 +10,15 @@ import CoreData
 
 class MainViewController: UIViewController {
     // MARK: - Properties
+    private let averageAgeLabel = UILabel()
+    private let medianAgeLabel = UILabel()
+    private let maxSalaryLabel = UILabel()
+    private let genderRatioLabel = UILabel()
+    private let stackView = UIStackView()
+    private let headerForAnalyticsView = UILabel()
+    private let headerForPublicProfileView = UILabel()
 
+    // MARK: - TableView
     private lazy var tableView: UITableView = {
         /// Appearance
         let tableView = UITableView(frame: view.bounds, style: .grouped)
@@ -24,6 +32,23 @@ class MainViewController: UIViewController {
         tableView.delegate = self
         
         return tableView
+    }()
+    
+    // MARK: - AnalyticsView
+    private lazy var analyticsView: UIView = {
+        let view = UIView(frame: CGRect(x: 0, y: 0, width: 300, height: 150))
+        view.backgroundColor = .white
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
+    }()
+    
+    // MARK: - Public profile
+    
+    private lazy var publicProfileView: UIView = {
+        let view = UIView(frame: CGRect(x: 0, y: 0, width: 300, height: 200))
+        view.backgroundColor = .white
+        view.translatesAutoresizingMaskIntoConstraints = false
+        return view
     }()
     
     private var models: [Employee] = []
@@ -44,16 +69,68 @@ class MainViewController: UIViewController {
         }
     }
 
-    // MARK: - TableView
+    // MARK: - Setup UI
     
     func setupUI() {
-        view.addSubview(tableView)
-        /// Contstraints
+        view.backgroundColor = .systemGray6
+        
+        [tableView, analyticsView, stackView, headerForAnalyticsView, headerForPublicProfileView, publicProfileView].forEach {
+            view.addSubview($0)
+            $0.translatesAutoresizingMaskIntoConstraints = false
+        }
+        
+        /// StackView in the AnalyticsView
+        [averageAgeLabel, medianAgeLabel, maxSalaryLabel, genderRatioLabel].forEach {
+            $0.textColor = .black
+            $0.font = UIFont.systemFont(ofSize: 14)
+            stackView.addArrangedSubview($0)
+        }
+                
+        stackView.axis = .vertical
+        stackView.distribution = .fillEqually
+        stackView.spacing = 6
+        stackView.alignment = .fill
+        
+        headerForAnalyticsView.text = "Analytics"
+        headerForPublicProfileView.text = "Public profile"
+        
+        [headerForAnalyticsView, headerForPublicProfileView].forEach {
+            $0.font = UIFont.boldSystemFont(ofSize: 16)
+        }
+
+        averageAgeLabel.text = "Average age is: "
+        medianAgeLabel.text = "Median age is: "
+        maxSalaryLabel.text = "Max salary is: "
+        genderRatioLabel.text = "Male vs Female workers ratio: "
+        
+        /// Constraints
         NSLayoutConstraint.activate([
             tableView.topAnchor.constraint(equalTo: view.topAnchor),
             tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
             tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+            tableView.heightAnchor.constraint(equalToConstant: 400),
+            
+            analyticsView.topAnchor.constraint(equalTo: tableView.bottomAnchor, constant: 50),
+            analyticsView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            analyticsView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            
+            stackView.topAnchor.constraint(equalTo: analyticsView.topAnchor, constant: 16),
+            stackView.leadingAnchor.constraint(equalTo: analyticsView.leadingAnchor, constant: 16),
+            stackView.trailingAnchor.constraint(equalTo: analyticsView.trailingAnchor, constant: -16),
+            stackView.bottomAnchor.constraint(equalTo: analyticsView.bottomAnchor, constant: -16),
+            
+            headerForAnalyticsView.topAnchor.constraint(equalTo: analyticsView.topAnchor, constant: -36),
+            headerForAnalyticsView.leadingAnchor.constraint(equalTo: analyticsView.leadingAnchor, constant: 16),
+            headerForAnalyticsView.trailingAnchor.constraint(equalTo: analyticsView.trailingAnchor, constant: -16),
+            
+            publicProfileView.topAnchor.constraint(equalTo: analyticsView.bottomAnchor, constant: 50),
+            publicProfileView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            publicProfileView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+            publicProfileView.heightAnchor.constraint(equalToConstant: 200),
+            
+            headerForPublicProfileView.topAnchor.constraint(equalTo: publicProfileView.topAnchor, constant: -36),
+            headerForPublicProfileView.leadingAnchor.constraint(equalTo: publicProfileView.leadingAnchor, constant: 16),
+            headerForPublicProfileView.trailingAnchor.constraint(equalTo: publicProfileView.trailingAnchor, constant: -16)
         ])
     }
     
@@ -95,6 +172,7 @@ class MainViewController: UIViewController {
         
         present(alert, animated: true)
     }
+    
 }
 
 // MARK: - UITableViewDataSource
@@ -115,4 +193,22 @@ extension MainViewController: UITableViewDataSource {
 
 extension MainViewController: UITableViewDelegate {
     
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 40
+    }
+
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let sectionView = UIView()
+        let label = UILabel()
+        label.text = "Employees List"
+        label.font = UIFont.boldSystemFont(ofSize: 16)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        sectionView.addSubview(label)
+        NSLayoutConstraint.activate([
+            label.leadingAnchor.constraint(equalTo: sectionView.leadingAnchor, constant: 16),
+            label.trailingAnchor.constraint(equalTo: sectionView.trailingAnchor, constant: -16),
+            label.topAnchor.constraint(equalTo: sectionView.topAnchor, constant: 10)
+        ])
+        return sectionView
+    }
 }

@@ -61,11 +61,14 @@ class CoreDataManager {
             if employee.isEmpty {
                 let tupleArray: [(gender: String,
                                   name: String,
-                                  salary: Double)] = [(gender: "FEMALE", name: "ALEKS", salary: 300),
-                                                      (gender: "Male", name: "John", salary: 5000),
-                                                      (gender: "FEMALE", name: "ANTON", salary: 10000)]
+                                  salary: Double)] = [(gender: "Male", name: "Aleksandr Poliakov", salary: 10000),
+                                                      (gender: "Female", name: "Oksana Poliakova", salary: 5000),
+                                                      (gender: "Female", name: "John Dou", salary: 8000)]
                 
 //                let sum = tupleArray.map({ $0.salary }).reduce(0, +) / Double(tupleArray.count)
+//                label.text =  "AverageAge: \(map{ $0 })"
+//                API KEY
+//                AIzaSyAJ4Pl1kyK-wHM2-hYeF9hcgU08otU97FA
                 
                 tupleArray.forEach { tuple in
                     self?.addEmployee(gender: tuple.gender, name: tuple.name, salary: tuple.salary, completion: nil)
