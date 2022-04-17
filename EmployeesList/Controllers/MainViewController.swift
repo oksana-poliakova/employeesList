@@ -62,6 +62,8 @@ class MainViewController: UIViewController {
         getAllEmployees()
     }
     
+    // MARK: - CoreData
+    
     private func getAllEmployees() {
         CoreDataManager().getAllEmployees { [weak self] employees in
             self?.models = employees
@@ -99,8 +101,6 @@ class MainViewController: UIViewController {
             $0.font = UIFont.boldSystemFont(ofSize: 16)
         }
         
-        //                let sum = tupleArray.map({ $0.salary }).reduce(0, +) / Double(tupleArray.count)
-        //                label.text =  "AverageAge: \(map{ $0 })"
         //                API KEY
         //                AIzaSyAJ4Pl1kyK-wHM2-hYeF9hcgU08otU97FA
         
@@ -146,9 +146,13 @@ class MainViewController: UIViewController {
     
     private func configureAnalytics(employee: [Employee]) {
         
-        averageAgeLabel.text = "Average age is: \(employee.compactMap({ $0.age }).reduce(0, +) / employee.count)"
-        medianAgeLabel.text = "Median age is: "
-        maxSalaryLabel.text = "Max salary is: "
+        let calculatingAverageAge = employee.compactMap({ $0.age }).reduce(0, +) / employee.count
+        let calculatingMedianAge = ((employee.compactMap({ $0.age}).max() ?? 0) + (employee.compactMap({ $0.age}).min() ?? 0)) / 2
+        let maxSalary = employee.compactMap({ $0.salary}).max()
+        
+        averageAgeLabel.text = "Average age is: \(calculatingAverageAge)"
+        medianAgeLabel.text = "Median age is: \(calculatingMedianAge)"
+        maxSalaryLabel.text = "Max salary is: \(maxSalary ?? 00)"
         genderRatioLabel.text = "Male vs Female workers ratio: "
     }
     
@@ -200,6 +204,49 @@ extension MainViewController: UITableViewDataSource {
         guard let cell = tableView.dequeueReusableCell(withIdentifier: "MainTableViewCell") as? MainTableViewCell else { return UITableViewCell() }
         cell.configureEmployee(model: models[indexPath.row])
         return cell
+    }
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        tableView.deselectRow(at: indexPath, animated: true)
+        let employee = models[indexPath.row]
+        
+        let sheet = UIAlertController(title: "Edit",
+                                      message: nil,
+                                      preferredStyle: .actionSheet)
+        
+        sheet.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
+
+        sheet.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { [weak self] _ in
+            self?.models.remove(at: indexPath.row)
+            CoreDataManager().deleteEmployee(item: employee)
+            tableView.reloadData()
+        }))
+        
+        present(sheet, animated: true)
+        
+        sheet.addAction(UIAlertAction(title: "Edit", style: .default, handler: { _ in
+                let alert = UIAlertController(title: "New Employee",
+                                              message: "Enter a new employee",
+                                              preferredStyle: .alert)
+                alert.addTextField(configurationHandler: nil)
+            alert.addTextField { textField in
+                textField.placeholder = "Update salary"
+            }
+                alert.textFields?[0].text = employee.name
+                alert.textFields?[1].text = "\(employee.salary)"
+                alert.addAction(UIAlertAction(title: "Update",
+                                              style: .cancel,
+                                              handler: { [weak self] _ in
+                guard let nameField = alert.textFields?[0], let nameText = nameField.text, !nameText.isEmpty else { return }
+                    guard let salaryField = alert.textFields?[1], let salaryText = salaryField.text, !salaryText.isEmpty else { return }
+
+                    employee.name =  nameText
+                    employee.salary = (salaryText as NSString).doubleValue
+                    tableView.reloadData()
+            }))
+            
+            self.present(alert, animated: true)
+        }))
     }
 }
 
