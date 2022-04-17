@@ -55,13 +55,16 @@ class CoreDataManager {
         } catch { }
     }
 
-    public func updateEmployee(item: Employee, newName: String, newSalary: Double) {
+    public func updateEmployee(item: Employee, newName: String, newSalary: Double, newBirthDate: Date, newGender: String, completion: ((Bool) -> ())? = nil) {
         item.name = newName
         item.salary = newSalary
+        item.birthDate = newBirthDate
+        item.gender = newGender
         
         do {
             try context.save()
-        } catch { }
+            completion?(true)
+        } catch { completion?(false) }
     }
     
     public func createDefaultEmployees() {
