@@ -30,7 +30,7 @@ class MainTableViewCell: UITableViewCell {
     public func configureEmployee(model: Employee) {
         nameLabel.text = "Name: \(model.name ?? "")"
         idLabel.text = "ID: \(String(describing: model.id))"
-        birthDateLabel.text = "Birthdate: \(model.birthDate?.description ?? "")"
+        birthDateLabel.text = "Birthdate: \(model.birthdateDescription)"
         genderLabel.text = "Gender: \(model.gender ?? "")"
         salaryLabel.text = "Salary: \(String(describing: model.salary))"
     }

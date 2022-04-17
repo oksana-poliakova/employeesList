@@ -17,7 +17,7 @@ class MainViewController: UIViewController {
     private let stackView = UIStackView()
     private let headerForAnalyticsView = UILabel()
     private let headerForPublicProfileView = UILabel()
-
+    
     // MARK: - TableView
     private lazy var tableView: UITableView = {
         /// Appearance
@@ -52,7 +52,7 @@ class MainViewController: UIViewController {
     }()
     
     private var models: [Employee] = []
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setNavigationItem()
@@ -71,7 +71,7 @@ class MainViewController: UIViewController {
             self?.tableView.reloadData()
         }
     }
-
+    
     // MARK: - Setup UI
     
     func setupUI() {
@@ -88,7 +88,7 @@ class MainViewController: UIViewController {
             $0.font = UIFont.systemFont(ofSize: 14)
             stackView.addArrangedSubview($0)
         }
-                
+        
         stackView.axis = .vertical
         stackView.distribution = .fillEqually
         stackView.spacing = 6
@@ -149,11 +149,12 @@ class MainViewController: UIViewController {
         let calculatingAverageAge = employee.compactMap({ $0.age }).reduce(0, +) / employee.count
         let calculatingMedianAge = ((employee.compactMap({ $0.age}).max() ?? 0) + (employee.compactMap({ $0.age}).min() ?? 0)) / 2
         let maxSalary = employee.compactMap({ $0.salary}).max()
+        let genderState: [GenderState] = employee.compactMap({ $0.genderState })
         
         averageAgeLabel.text = "Average age is: \(calculatingAverageAge)"
         medianAgeLabel.text = "Median age is: \(calculatingMedianAge)"
         maxSalaryLabel.text = "Max salary is: \(maxSalary ?? 00)"
-        genderRatioLabel.text = "Male vs Female workers ratio: "
+        genderRatioLabel.text = "Male vs Female workers ratio: Male \(genderState.filter { $0.rawValue == "Male" }.count ) Female \(genderState.filter { $0.rawValue == "Female" }.count)"
     }
     
     @objc private func didTapAdd() {
@@ -173,7 +174,7 @@ class MainViewController: UIViewController {
         alert.addTextField { textField in
             textField.placeholder = "Add birthdate: XXXX-XX-XX"
         }
-
+        
         alert.addAction(UIAlertAction(title: "Submit",
                                       style: .cancel,
                                       handler: { [weak self] _ in
@@ -185,7 +186,6 @@ class MainViewController: UIViewController {
             CoreDataManager().addEmployee(gender: genderText, name: nameText, salary: (salaryText as NSString).doubleValue, date: birthdateText) { isAdded in
                 if isAdded { self?.getAllEmployees() }
             }
-            
         }))
         
         present(alert, animated: true)
@@ -215,34 +215,55 @@ extension MainViewController: UITableViewDataSource {
                                       preferredStyle: .actionSheet)
         
         sheet.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: nil))
-
+        
         sheet.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { [weak self] _ in
             self?.models.remove(at: indexPath.row)
             CoreDataManager().deleteEmployee(item: employee)
+            self?.configureAnalytics(employee: self?.models ?? [])
             tableView.reloadData()
         }))
         
         present(sheet, animated: true)
         
         sheet.addAction(UIAlertAction(title: "Edit", style: .default, handler: { _ in
-                let alert = UIAlertController(title: "New Employee",
-                                              message: "Enter a new employee",
-                                              preferredStyle: .alert)
-                alert.addTextField(configurationHandler: nil)
-            alert.addTextField { textField in
-                textField.placeholder = "Update salary"
-            }
-                alert.textFields?[0].text = employee.name
-                alert.textFields?[1].text = "\(employee.salary)"
-                alert.addAction(UIAlertAction(title: "Update",
-                                              style: .cancel,
-                                              handler: { [weak self] _ in
+            let alert = UIAlertController(title: "New Employee",
+                                          message: "Enter a new employee",
+                                          preferredStyle: .alert)
+            alert.addTextField(configurationHandler: nil)
+            alert.addTextField(configurationHandler: nil)
+            alert.addTextField(configurationHandler: nil)
+            alert.addTextField(configurationHandler: nil)
+            alert.textFields?[0].text = employee.name
+            alert.textFields?[1].text = "\(employee.salary)"
+            alert.textFields?[2].text = "\(employee.birthdateDescription)"
+            alert.textFields?[3].text = "\(employee.genderState.rawValue)"
+            alert.addAction(UIAlertAction(title: "Update",
+                                          style: .cancel,
+                                          handler: { [weak self] _ in
                 guard let nameField = alert.textFields?[0], let nameText = nameField.text, !nameText.isEmpty else { return }
-                    guard let salaryField = alert.textFields?[1], let salaryText = salaryField.text, !salaryText.isEmpty else { return }
-
-                    employee.name =  nameText
-                    employee.salary = (salaryText as NSString).doubleValue
-                    tableView.reloadData()
+                guard let salaryField = alert.textFields?[1], let salaryText = salaryField.text, !salaryText.isEmpty else { return }
+                guard let birthdateField = alert.textFields?[2], let birthdateText = birthdateField.text, !birthdateText.isEmpty else { return }
+                guard let genderField = alert.textFields?[3], let genderText = genderField.text, !genderText.isEmpty else { return }
+                
+                let isoDate = birthdateText
+                let dateFormatter = DateFormatter()
+                dateFormatter.locale = Locale.current
+                
+                dateFormatter.dateFormat = "yyyy-MM-dd"
+                guard let date = dateFormatter.date(from: isoDate) else { return }
+                
+                employee.name = nameText
+                employee.salary = (salaryText as NSString).doubleValue
+                employee.birthDate = date
+                employee.gender = genderText
+                
+                
+                CoreDataManager().updateEmployee(item: employee, newName: nameText, newSalary: (salaryText as NSString).doubleValue, newBirthDate: date, newGender: genderText) { updated in
+                    if updated {
+                        tableView.reloadData()
+                        self?.configureAnalytics(employee: self?.models ?? [])
+                    }
+                }
             }))
             
             self.present(alert, animated: true)
@@ -257,7 +278,7 @@ extension MainViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         return 40
     }
-
+    
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let sectionView = UIView()
         let label = UILabel()
